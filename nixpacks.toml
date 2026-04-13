@@ -1,11 +1,11 @@
 providers = ["node", "python"]
 
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_22"]
 
 [phases.build]
 cmds = [
-  "cd app/frontend && npm install && npm run build",
+  "cd app/frontend && rm -rf node_modules package-lock.json && npm install && npm run build",
   "cd app/backend && pip install -r requirements.txt"
 ]
 

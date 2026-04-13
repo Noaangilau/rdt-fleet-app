@@ -29,13 +29,14 @@ export default function DriverMileage() {
     try {
       await api.post("/mileage", {
         truck_id: parseInt(truckId),
-        reported_mileage: parseInt(mileage),
+        mileage: parseInt(mileage),
       });
       setSuccess(true);
       setMileage("");
       setTruckId("");
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to submit mileage.");
+      const detail = err.response?.data?.detail;
+      setError(typeof detail === "string" ? detail : "Failed to submit mileage.");
     } finally {
       setLoading(false);
     }

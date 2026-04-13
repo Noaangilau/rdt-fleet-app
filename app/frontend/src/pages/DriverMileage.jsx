@@ -50,21 +50,23 @@ export default function DriverMileage() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
         <div className="text-center max-w-sm">
-          <div className="text-5xl mb-4">✅</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Mileage Logged!</h2>
-          <p className="text-gray-500 text-sm mb-6">Your mileage has been recorded successfully.</p>
+          <div className="text-5xl mb-4">🛣️</div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Mileage Updated</h2>
+          <p className="text-gray-500 text-sm mb-6">Your odometer reading has been recorded.</p>
           <button
-            onClick={() => setSuccess(false)}
+            onClick={() => { setSuccess(false); setMileage(""); setTruckId(""); }}
             className="w-full bg-[#68ccd1] text-white font-semibold py-3 rounded-xl text-sm"
           >
             Log Another
           </button>
-          <button
-            onClick={() => navigate("/driver-home")}
-            className="w-full mt-3 border border-gray-300 text-gray-700 font-medium py-3 rounded-xl text-sm"
-          >
-            Back to Home
-          </button>
+          <div className="mt-4">
+            <button
+              onClick={() => navigate("/driver-home")}
+              className="text-sm text-gray-500 underline"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );

@@ -1,0 +1,30 @@
+# Environment and secrets
+.env
+credentials.json
+token.json
+
+# Temporary processing files
+.tmp/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# OS
+.DS_Store
+
+# SQLite database (seeded on startup — do not commit)
+*.db
+*.sqlite3
+app/backend/fleet.db
+
+# Node
+node_modules/
+app/frontend/node_modules/
+
+# Vite build output (built at deploy time)
+app/frontend/dist/

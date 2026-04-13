@@ -1,5 +1,8 @@
 providers = ["node", "python"]
 
+[phases.setup]
+nixPkgs = ["nodejs_20", "python312"]
+
 [phases.build]
 cmds = [
   "cd app/frontend && npm install && npm run build",

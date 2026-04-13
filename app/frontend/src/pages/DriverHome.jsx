@@ -49,6 +49,13 @@ export default function DriverHome() {
           >
             Report an Incident
           </button>
+
+          <button
+            onClick={() => navigate("/checkin")}
+            className="w-full bg-white border-2 border-gray-200 text-gray-800 font-bold py-5 rounded-2xl text-base transition-colors hover:border-[#68ccd1]"
+          >
+            Update My Status
+          </button>
         </div>
       </div>
     </div>

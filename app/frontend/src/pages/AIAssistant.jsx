@@ -11,8 +11,11 @@ const SUGGESTIONS = [
   "Which trucks need an oil change?",
   "Are there any overdue maintenance items?",
   "Summarize all open incidents",
+  "Which drivers are on duty right now?",
+  "What routes are scheduled for today?",
+  "Are any driver documents expiring soon?",
+  "What did we spend on fuel and repairs this month?",
   "Which trucks are in the best shape?",
-  "What maintenance is coming up this month?",
 ];
 
 export default function AIAssistant() {

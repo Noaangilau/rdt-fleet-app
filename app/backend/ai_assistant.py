@@ -10,7 +10,7 @@ Claude's limits and cheap to send on every message.
 """
 
 import os
-from datetime import date
+from datetime import date, timedelta
 from sqlalchemy.orm import Session
 import anthropic
 import models
@@ -97,9 +97,75 @@ def assemble_context(db: Session) -> str:
             f"{inc.driver_name}: {inc.description} (Status: {inc.status})"
         )
 
+    # Driver availability
+    drivers = db.query(models.User).filter(models.User.role == "driver", models.User.is_active == True).all()
+    driver_lines = []
+    for driver in drivers:
+        avail = db.query(models.DriverAvailability).filter(
+            models.DriverAvailability.driver_id == driver.id
+        ).first()
+        status_str = avail.status if avail else "off_duty"
+        route_str = f" (Route: {avail.current_route})" if avail and avail.current_route else ""
+        driver_lines.append(
+            f"  {driver.full_name or driver.username}: {status_str}{route_str}"
+        )
+
+    # Today's routes
+    today_routes = (
+        db.query(models.Route)
+        .filter(models.Route.date == today)
+        .order_by(models.Route.name)
+        .all()
+    )
+    route_lines = []
+    for r in today_routes:
+        driver_obj = db.query(models.User).filter(models.User.id == r.driver_id).first() if r.driver_id else None
+        truck_obj = db.query(models.Truck).filter(models.Truck.id == r.truck_id).first() if r.truck_id else None
+        parts = [f"  {r.name}:"]
+        parts.append(f"Driver={driver_obj.full_name or driver_obj.username if driver_obj else 'Unassigned'}")
+        parts.append(f"Truck={truck_obj.truck_number if truck_obj else 'Unassigned'}")
+        if r.notes:
+            parts.append(f"Notes={r.notes}")
+        route_lines.append(" ".join(parts))
+
+    # Pending approvals
+    pending_approvals = (
+        db.query(models.ApprovalQueue)
+        .filter(models.ApprovalQueue.status == "pending")
+        .all()
+    )
+
+    # Expiring documents (within 30 days)
+    cutoff = today + timedelta(days=30)
+    expiring_docs = (
+        db.query(models.DriverDocument)
+        .filter(
+            models.DriverDocument.expiry_date != None,
+            models.DriverDocument.expiry_date <= cutoff,
+        )
+        .order_by(models.DriverDocument.expiry_date)
+        .all()
+    )
+    doc_lines = []
+    for doc in expiring_docs:
+        driver_obj = db.query(models.User).filter(models.User.id == doc.driver_id).first()
+        days_left = (doc.expiry_date - today).days
+        status_word = "EXPIRED" if days_left < 0 else f"expires in {days_left}d"
+        doc_lines.append(
+            f"  {driver_obj.full_name or driver_obj.username if driver_obj else 'Unknown'} — "
+            f"{doc.document_type}: {status_word} ({doc.expiry_date})"
+        )
+
+    # Financial summary: last 30 days
+    thirty_days_ago = today - timedelta(days=30)
+    recent_fuel = db.query(models.FuelLog).filter(models.FuelLog.date >= thirty_days_ago).all()
+    recent_repairs = db.query(models.RepairCost).filter(models.RepairCost.date >= thirty_days_ago).all()
+    total_fuel_cost = sum(f.total_cost for f in recent_fuel)
+    total_repair_cost = sum(r.cost for r in recent_repairs)
+
     # Build the full system prompt
     context = f"""You are FleetBot, the AI assistant for RDT Inc.'s fleet management system.
-RDT Inc. is a family-owned waste removal company based in Vernal, Utah, serving Uintah, Duchesne, and surrounding basin counties. They have been in business for 27 years.
+RDT Inc. is a family-owned waste removal company based in Vernal, Utah, serving Uintah, Duchesne, and surrounding basin counties. They have been in business for 27 years. Fleet types include fully automated garbage trucks, roll-off trucks, dumpster/compactor trucks.
 
 Today's date: {today}
 
@@ -115,6 +181,23 @@ Trucks with upcoming maintenance (YELLOW status): {', '.join(yellow_trucks) if y
 
 === OPEN INCIDENTS ===
 {chr(10).join(incident_lines) if incident_lines else 'No open incidents.'}
+
+=== DRIVER AVAILABILITY (TODAY) ===
+{chr(10).join(driver_lines) if driver_lines else 'No drivers on record.'}
+
+=== TODAY\'S ROUTES ===
+{chr(10).join(route_lines) if route_lines else 'No routes scheduled for today.'}
+
+=== PENDING APPROVALS ===
+{len(pending_approvals)} item(s) awaiting manager approval.
+
+=== EXPIRING DRIVER DOCUMENTS (next 30 days) ===
+{chr(10).join(doc_lines) if doc_lines else 'No documents expiring in the next 30 days.'}
+
+=== FLEET FINANCIALS (last 30 days) ===
+Total fuel cost: ${total_fuel_cost:,.2f} ({len(recent_fuel)} fill-ups)
+Total repair cost: ${total_repair_cost:,.2f} ({len(recent_repairs)} repair entries)
+Combined fleet cost: ${total_fuel_cost + total_repair_cost:,.2f}
 
 Answer questions concisely and accurately based on the data above.
 Reference trucks by their truck number (e.g., T-01).

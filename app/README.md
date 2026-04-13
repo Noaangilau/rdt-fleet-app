@@ -83,7 +83,6 @@ pip3 install -r requirements.txt
 ```
 
 This downloads all the code the app needs to run. It may take 1–2 minutes. You'll see a lot of text scroll by — that's normal.
-
 ---
 
 ## Step 5 — Start the Backend

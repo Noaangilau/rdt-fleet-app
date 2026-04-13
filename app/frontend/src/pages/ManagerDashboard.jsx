@@ -30,7 +30,8 @@ export default function ManagerDashboard() {
   }
 
   const { total_trucks, trucks_needing_attention, total_red_items, total_yellow_items,
-    total_green_items, truck_summaries, open_incidents, recent_mileage_logs } = data;
+    total_green_items, truck_summaries, open_incidents, recent_mileage_logs,
+    pending_approvals_count, drivers_on_duty, expiring_documents_count } = data;
 
   const severityColor = { high: "text-red-600", medium: "text-yellow-600", low: "text-green-600" };
   const statusColor = { open: "bg-red-100 text-red-700", in_review: "bg-yellow-100 text-yellow-700", resolved: "bg-green-100 text-green-700" };
@@ -55,11 +56,16 @@ export default function ManagerDashboard() {
         )}
 
         {/* Stat cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <StatCard label="Total Trucks" value={total_trucks} color="text-gray-900" />
           <StatCard label="Overdue Items" value={total_red_items} color="text-red-600" />
           <StatCard label="Due Soon" value={total_yellow_items} color="text-yellow-600" />
           <StatCard label="Good" value={total_green_items} color="text-green-600" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+          <StatCard label="Pending Approvals" value={pending_approvals_count ?? 0} color={pending_approvals_count > 0 ? "text-yellow-600" : "text-gray-400"} />
+          <StatCard label="Drivers On Duty" value={drivers_on_duty ?? 0} color="text-green-600" />
+          <StatCard label="Expiring Docs" value={expiring_documents_count ?? 0} color={expiring_documents_count > 0 ? "text-orange-600" : "text-gray-400"} />
         </div>
 
         {/* Truck grid */}

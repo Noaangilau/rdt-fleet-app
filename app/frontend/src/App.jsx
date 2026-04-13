@@ -11,12 +11,18 @@ import Login from "./pages/Login";
 import DriverHome from "./pages/DriverHome";
 import DriverMileage from "./pages/DriverMileage";
 import DriverIncident from "./pages/DriverIncident";
+import DriverCheckin from "./pages/DriverCheckin";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import Trucks from "./pages/Trucks";
 import TruckDetail from "./pages/TruckDetail";
 import Incidents from "./pages/Incidents";
 import Drivers from "./pages/Drivers";
 import AIAssistant from "./pages/AIAssistant";
+import Approvals from "./pages/Approvals";
+import Operations from "./pages/Operations";
+import Scheduling from "./pages/Scheduling";
+import HR from "./pages/HR";
+import Financials from "./pages/Financials";
 
 function RoleRedirect() {
   const { user, loading } = useAuth();
@@ -42,6 +48,9 @@ export default function App() {
           <Route path="/incident" element={
             <ProtectedRoute role="driver"><DriverIncident /></ProtectedRoute>
           } />
+          <Route path="/checkin" element={
+            <ProtectedRoute role="driver"><DriverCheckin /></ProtectedRoute>
+          } />
 
           {/* Manager routes */}
           <Route path="/dashboard" element={
@@ -55,6 +64,21 @@ export default function App() {
           } />
           <Route path="/incidents" element={
             <ProtectedRoute role="manager"><Incidents /></ProtectedRoute>
+          } />
+          <Route path="/approvals" element={
+            <ProtectedRoute role="manager"><Approvals /></ProtectedRoute>
+          } />
+          <Route path="/operations" element={
+            <ProtectedRoute role="manager"><Operations /></ProtectedRoute>
+          } />
+          <Route path="/scheduling" element={
+            <ProtectedRoute role="manager"><Scheduling /></ProtectedRoute>
+          } />
+          <Route path="/hr" element={
+            <ProtectedRoute role="manager"><HR /></ProtectedRoute>
+          } />
+          <Route path="/financials" element={
+            <ProtectedRoute role="manager"><Financials /></ProtectedRoute>
           } />
           <Route path="/drivers" element={
             <ProtectedRoute role="manager"><Drivers /></ProtectedRoute>

@@ -7,8 +7,10 @@ GET /api/dashboard — returns fleet-wide status summary, open incidents,
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from datetime import date, timedelta
 from database import get_db
-import models, schemas
+import models
+import schemas
 from auth import require_manager
 from maintenance_logic import get_truck_overall_status
 from routers.incidents import SEVERITY_ORDER
@@ -97,6 +99,23 @@ def get_dashboard(
         .all()
     )
 
+    # Pending approvals count
+    pending_approvals = db.query(models.ApprovalQueue).filter(
+        models.ApprovalQueue.status == "pending"
+    ).count()
+
+    # Drivers currently on duty
+    drivers_on_duty = db.query(models.DriverAvailability).filter(
+        models.DriverAvailability.status == "on_duty"
+    ).count()
+
+    # Documents expiring within 30 days
+    cutoff = date.today() + timedelta(days=30)
+    expiring_docs = db.query(models.DriverDocument).filter(
+        models.DriverDocument.expiry_date != None,
+        models.DriverDocument.expiry_date <= cutoff,
+    ).count()
+
     return schemas.DashboardResponse(
         total_trucks=len(trucks),
         trucks_needing_attention=trucks_needing_attention,
@@ -115,4 +134,7 @@ def get_dashboard(
             )
             for log in recent_logs
         ],
+        pending_approvals_count=pending_approvals,
+        drivers_on_duty=drivers_on_duty,
+        expiring_documents_count=expiring_docs,
     )

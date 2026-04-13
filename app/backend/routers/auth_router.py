@@ -8,7 +8,8 @@ GET  /api/auth/me     — returns the current user's info
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
-import models, schemas
+import models
+import schemas
 from auth import verify_password, create_access_token, get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])

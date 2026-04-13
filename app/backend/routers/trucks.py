@@ -12,11 +12,11 @@ DELETE /api/trucks/{id}      — remove truck (cascades maintenance + incidents)
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
-import models, schemas
-from models import MAINTENANCE_ITEM_TYPES, DEFAULT_INTERVALS
+import models
+import schemas
+from models import MAINTENANCE_ITEM_TYPES, DEFAULT_INTERVALS, ITEM_TYPE_LABELS
 from auth import require_manager, require_driver
 from maintenance_logic import calculate_item_status, get_truck_overall_status
-from models import ITEM_TYPE_LABELS
 
 router = APIRouter(prefix="/api/trucks", tags=["trucks"])
 

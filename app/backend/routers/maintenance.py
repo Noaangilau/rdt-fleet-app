@@ -9,7 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from database import get_db
-import models, schemas
+import models
+import schemas
 from auth import require_manager
 from maintenance_logic import calculate_item_status
 from models import ITEM_TYPE_LABELS

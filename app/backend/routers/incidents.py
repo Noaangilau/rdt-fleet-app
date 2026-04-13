@@ -11,7 +11,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from database import get_db
-import models, schemas
+import models
+import schemas
 from auth import require_manager, require_driver
 
 router = APIRouter(prefix="/api/incidents", tags=["incidents"])

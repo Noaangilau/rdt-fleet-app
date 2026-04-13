@@ -36,6 +36,10 @@ from routers.incidents import router as incidents_router
 from routers.dashboard import router as dashboard_router
 from routers.users import router as users_router
 from routers.ai import router as ai_router
+from routers.operations import router as operations_router
+from routers.hr import router as hr_router
+from routers.notifications import router as notifications_router
+from routers.fleet import router as fleet_router
 
 
 @asynccontextmanager
@@ -86,6 +90,10 @@ app.include_router(incidents_router)
 app.include_router(dashboard_router)
 app.include_router(users_router)
 app.include_router(ai_router)
+app.include_router(operations_router)
+app.include_router(hr_router)
+app.include_router(notifications_router)
+app.include_router(fleet_router)
 
 
 # ---------------------------------------------------------------------------

@@ -10,7 +10,8 @@ DELETE /api/users/{id}   — deactivate a driver account
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
-import models, schemas
+import models
+import schemas
 from auth import require_manager, hash_password
 
 router = APIRouter(prefix="/api/users", tags=["users"])

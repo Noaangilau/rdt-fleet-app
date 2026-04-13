@@ -8,7 +8,8 @@ POST /api/ai/chat — accepts a message and conversation history,
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database import get_db
-import models, schemas
+import models
+import schemas
 from auth import require_manager
 from ai_assistant import chat
 

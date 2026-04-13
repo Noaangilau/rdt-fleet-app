@@ -19,6 +19,7 @@ const navItems = [
   { to: "/financials", label: "Financials", icon: "💰" },
   { to: "/drivers", label: "Drivers", icon: "👥" },
   { to: "/ai", label: "AI Assistant", icon: "🤖" },
+  { to: "/settings", label: "Settings", icon: "⚙️" },
 ];
 
 const NOTIF_ICONS = {

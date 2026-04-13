@@ -26,6 +26,7 @@ from schemas.hr import (
 )
 from schemas.dashboard import TruckStatusSummary, DashboardResponse, ChatMessage, ChatRequest, ChatResponse
 from schemas.notifications import NotificationOut, NotificationCountOut
+from schemas.briefing import BriefingSettingsOut, BriefingSettingsUpdate, BriefingLogOut
 
 __all__ = [
     "LoginRequest", "TokenResponse", "UserOut", "CreateUserRequest", "UpdateUserRequest",
@@ -46,4 +47,5 @@ __all__ = [
     "TruckStatusSummary", "DashboardResponse",
     "ChatMessage", "ChatRequest", "ChatResponse",
     "NotificationOut", "NotificationCountOut",
+    "BriefingSettingsOut", "BriefingSettingsUpdate", "BriefingLogOut",
 ]

@@ -12,6 +12,7 @@ from models.incidents import IncidentReport
 from models.operations import DriverAvailability, Route, MissedPickup, ApprovalQueue
 from models.hr import DriverDocument, Attendance, DriverNote
 from models.notifications import Notification
+from models.briefing import BriefingSettings, BriefingLog
 
 __all__ = [
     "User",
@@ -21,4 +22,5 @@ __all__ = [
     "DriverAvailability", "Route", "MissedPickup", "ApprovalQueue",
     "DriverDocument", "Attendance", "DriverNote",
     "Notification",
+    "BriefingSettings", "BriefingLog",
 ]

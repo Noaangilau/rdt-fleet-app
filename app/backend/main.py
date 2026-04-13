@@ -28,6 +28,9 @@ import models  # noqa — ensures all models are registered with Base before cre
 from seed import run_all_seeds
 
 # Import all routers
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from briefing_agent import run_morning_briefing
+
 from routers.auth_router import router as auth_router
 from routers.trucks import router as trucks_router
 from routers.maintenance import router as maintenance_router
@@ -40,6 +43,7 @@ from routers.operations import router as operations_router
 from routers.hr import router as hr_router
 from routers.notifications import router as notifications_router
 from routers.fleet import router as fleet_router
+from routers.briefings import router as briefings_router
 
 
 @asynccontextmanager
@@ -53,10 +57,28 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         run_all_seeds(db)
+
+        # Start the morning briefing scheduler
+        scheduler = AsyncIOScheduler()
+        settings = db.query(models.BriefingSettings).first()
+        if settings and settings.enabled:
+            hour, minute = settings.send_time.split(":")
+            scheduler.add_job(
+                run_morning_briefing,
+                trigger="cron",
+                hour=int(hour),
+                minute=int(minute),
+                id="morning_briefing",
+            )
+        scheduler.start()
+        app.state.scheduler = scheduler
+        print("✓ APScheduler started")
     finally:
         db.close()
 
     yield  # App runs here
+
+    app.state.scheduler.shutdown()
 
 
 app = FastAPI(
@@ -94,6 +116,7 @@ app.include_router(operations_router)
 app.include_router(hr_router)
 app.include_router(notifications_router)
 app.include_router(fleet_router)
+app.include_router(briefings_router)
 
 
 # ---------------------------------------------------------------------------

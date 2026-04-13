@@ -23,6 +23,7 @@ import Operations from "./pages/Operations";
 import Scheduling from "./pages/Scheduling";
 import HR from "./pages/HR";
 import Financials from "./pages/Financials";
+import Settings from "./pages/Settings";
 
 function RoleRedirect() {
   const { user, loading } = useAuth();
@@ -85,6 +86,9 @@ export default function App() {
           } />
           <Route path="/ai" element={
             <ProtectedRoute role="manager"><AIAssistant /></ProtectedRoute>
+          } />
+          <Route path="/settings" element={
+            <ProtectedRoute role="manager"><Settings /></ProtectedRoute>
           } />
 
           {/* Default redirect */}

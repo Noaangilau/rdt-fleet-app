@@ -14,7 +14,7 @@ maintenance statuses (green/yellow/red) to showcase the dashboard.
 
 from datetime import date, timedelta
 from sqlalchemy.orm import Session
-from models import User, Truck, MaintenanceItem, IncidentReport, MileageLog
+from models import User, Truck, MaintenanceItem, IncidentReport, MileageLog, BriefingSettings
 from models import MAINTENANCE_ITEM_TYPES, DEFAULT_INTERVALS
 from auth import hash_password
 
@@ -329,8 +329,18 @@ def seed_demo_drivers(db: Session):
     print("✓ Seeded demo driver accounts")
 
 
+def seed_briefing_settings(db: Session):
+    """Create the default BriefingSettings row if it doesn't already exist."""
+    if db.query(BriefingSettings).first():
+        return
+    settings = BriefingSettings(enabled=False, send_time="05:30", email_address="")
+    db.add(settings)
+    db.commit()
+
+
 def run_all_seeds(db: Session):
     """Run all seed functions in order. Called from main.py on startup."""
     seed_users(db)
     seed_demo_drivers(db)
     seed_demo_fleet(db)
+    seed_briefing_settings(db)

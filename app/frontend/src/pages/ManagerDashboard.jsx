@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import TruckCard from "../components/TruckCard";
 import StatusBadge from "../components/StatusBadge";
@@ -11,12 +12,16 @@ import api from "../api";
 export default function ManagerDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastBriefing, setLastBriefing] = useState(undefined); // undefined=loading, null=none
 
   useEffect(() => {
     api.get("/dashboard").then((res) => {
       setData(res.data);
       setLoading(false);
     });
+    api.get("/briefings/history").then((res) => {
+      setLastBriefing(res.data[0] ?? null);
+    }).catch(() => setLastBriefing(null));
   }, []);
 
   if (loading) {
@@ -67,6 +72,9 @@ export default function ManagerDashboard() {
           <StatCard label="Drivers On Duty" value={drivers_on_duty ?? 0} color="text-green-600" />
           <StatCard label="Expiring Docs" value={expiring_documents_count ?? 0} color={expiring_documents_count > 0 ? "text-orange-600" : "text-gray-400"} />
         </div>
+
+        {/* Last Briefing Card */}
+        <LastBriefingCard briefing={lastBriefing} />
 
         {/* Truck grid */}
         <h2 className="text-lg font-semibold text-gray-800 mb-3">Fleet Status</h2>
@@ -143,6 +151,50 @@ function StatCard({ label, value, color }) {
     <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
       <div className={`text-3xl font-bold ${color}`}>{value}</div>
       <div className="text-xs text-gray-500 mt-1">{label}</div>
+    </div>
+  );
+}
+
+function LastBriefingCard({ briefing }) {
+  // still loading
+  if (briefing === undefined) return null;
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 mb-8">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className="text-base">☀️</span>
+          <span className="text-sm font-semibold text-gray-800">Morning Briefing</span>
+        </div>
+        <Link to="/settings" className="text-xs text-[#3aa3a8] hover:underline">
+          Configure
+        </Link>
+      </div>
+
+      {briefing === null ? (
+        <p className="text-xs text-gray-400">
+          Morning briefing not configured —{" "}
+          <Link to="/settings" className="text-[#3aa3a8] hover:underline">
+            set up in Settings
+          </Link>
+        </p>
+      ) : (
+        <>
+          <p className="text-sm text-gray-700 leading-relaxed line-clamp-3">
+            {briefing.briefing_text}
+          </p>
+          <div className="flex items-center gap-3 mt-2">
+            <span className="text-xs text-gray-400">
+              {new Date(briefing.sent_at).toLocaleString()}
+            </span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+              briefing.success ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+            }`}>
+              {briefing.success ? "Sent" : "Failed"}
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

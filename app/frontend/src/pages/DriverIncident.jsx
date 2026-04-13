@@ -65,10 +65,10 @@ export default function DriverIncident() {
             Submit Another
           </button>
           <button
-            onClick={() => navigate("/mileage")}
+            onClick={() => navigate("/driver-home")}
             className="w-full mt-3 border border-gray-300 text-gray-700 font-medium py-3 rounded-xl text-sm"
           >
-            Back to Mileage
+            Back to Home
           </button>
         </div>
       </div>
@@ -175,8 +175,8 @@ export default function DriverIncident() {
         </form>
 
         <div className="mt-8 text-center">
-          <button onClick={() => navigate("/mileage")} className="text-sm text-gray-500 underline">
-            Back to Mileage
+          <button onClick={() => navigate("/driver-home")} className="text-sm text-gray-500 underline">
+            Back to Home
           </button>
         </div>
       </div>

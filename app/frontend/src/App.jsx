@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
 import Login from "./pages/Login";
+import DriverHome from "./pages/DriverHome";
 import DriverMileage from "./pages/DriverMileage";
 import DriverIncident from "./pages/DriverIncident";
 import ManagerDashboard from "./pages/ManagerDashboard";
@@ -21,7 +22,7 @@ function RoleRedirect() {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  return <Navigate to={user.role === "manager" ? "/dashboard" : "/mileage"} replace />;
+  return <Navigate to={user.role === "manager" ? "/dashboard" : "/driver-home"} replace />;
 }
 
 export default function App() {
@@ -32,6 +33,9 @@ export default function App() {
           <Route path="/login" element={<Login />} />
 
           {/* Driver routes */}
+          <Route path="/driver-home" element={
+            <ProtectedRoute role="driver"><DriverHome /></ProtectedRoute>
+          } />
           <Route path="/mileage" element={
             <ProtectedRoute role="driver"><DriverMileage /></ProtectedRoute>
           } />

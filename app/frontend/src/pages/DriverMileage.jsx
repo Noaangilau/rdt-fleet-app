@@ -60,10 +60,10 @@ export default function DriverMileage() {
             Log Another
           </button>
           <button
-            onClick={() => navigate("/incident")}
+            onClick={() => navigate("/driver-home")}
             className="w-full mt-3 border border-gray-300 text-gray-700 font-medium py-3 rounded-xl text-sm"
           >
-            Report an Incident
+            Back to Home
           </button>
         </div>
       </div>
@@ -141,13 +141,12 @@ export default function DriverMileage() {
           </button>
         </form>
 
-        {/* Quick link to incident */}
         <div className="mt-8 text-center">
           <button
-            onClick={() => navigate("/incident")}
+            onClick={() => navigate("/driver-home")}
             className="text-sm text-gray-500 underline"
           >
-            Need to report an incident?
+            Back to Home
           </button>
         </div>
       </div>

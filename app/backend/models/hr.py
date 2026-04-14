@@ -23,7 +23,7 @@ class Attendance(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     driver_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    work_date = Column(Date, nullable=False)
+    work_date = Column('date', Date, nullable=False)
     status = Column(String(20), nullable=False)  # present, absent, late, excused
     shift_start = Column(DateTime, nullable=True)
     shift_end = Column(DateTime, nullable=True)

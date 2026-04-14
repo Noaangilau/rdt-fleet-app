@@ -18,6 +18,11 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+from dotenv import load_dotenv
+
+_ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
+load_dotenv(dotenv_path=_ENV_PATH, override=True)
+
 import anthropic
 from sqlalchemy.orm import Session
 
@@ -131,6 +136,9 @@ def run_morning_briefing():
     reads BriefingSettings, generates a briefing via Claude, attempts to send
     it by email, and writes the result to BriefingLog regardless of outcome.
     """
+    # Reload .env every time so Railway / uvicorn subprocess always gets fresh values
+    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"), override=True)
+
     db: Session = SessionLocal()
     try:
         settings = db.query(models.BriefingSettings).first()

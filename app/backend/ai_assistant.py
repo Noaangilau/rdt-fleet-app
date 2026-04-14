@@ -119,8 +119,8 @@ def assemble_context(db: Session) -> str:
     )
     route_lines = []
     for r in today_routes:
-        driver_obj = db.query(models.User).filter(models.User.id == r.driver_id).first() if r.driver_id else None
-        truck_obj = db.query(models.Truck).filter(models.Truck.id == r.truck_id).first() if r.truck_id else None
+        driver_obj = db.query(models.User).filter(models.User.id == r.assigned_driver_id).first() if r.assigned_driver_id else None
+        truck_obj = db.query(models.Truck).filter(models.Truck.id == r.assigned_truck_id).first() if r.assigned_truck_id else None
         parts = [f"  {r.name}:"]
         parts.append(f"Driver={driver_obj.full_name or driver_obj.username if driver_obj else 'Unassigned'}")
         parts.append(f"Truck={truck_obj.truck_number if truck_obj else 'Unassigned'}")
@@ -223,7 +223,7 @@ def chat(message: str, history: list, db: Session) -> str:
     if not api_key:
         return (
             "AI assistant is not configured. "
-            "Please set the ANTHROPIC_API_KEY environment variable."
+            "Please set the ANTHROPIC_API_KEY in .env"
         )
 
     client = anthropic.Anthropic(api_key=api_key)

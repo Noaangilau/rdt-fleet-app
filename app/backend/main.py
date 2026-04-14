@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 # Load .env file (API keys, JWT secret, database URL)
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"), override=True)
 
 from database import engine, SessionLocal, Base
 import models  # noqa — ensures all models are registered with Base before create_all

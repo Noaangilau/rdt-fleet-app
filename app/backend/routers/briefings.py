@@ -15,7 +15,7 @@ from database import get_db
 from auth import require_manager
 import models
 import schemas
-from briefing_agent import run_morning_briefing
+from briefing_agent import generate_briefing, send_email
 
 router = APIRouter(prefix="/api/briefings", tags=["briefings"])
 
@@ -105,17 +105,27 @@ def send_now(
     db: Session = Depends(get_db),
 ):
     """
-    Trigger the morning briefing immediately (for testing/manual sends).
-    Runs synchronously — FastAPI executes sync endpoints in a thread pool.
-    Returns the log entry that was just created.
+    Trigger the morning briefing immediately (manual send / testing).
+    Always runs regardless of the enabled setting.
+    Generates the briefing, attempts email, logs the result, returns the log entry.
     """
-    run_morning_briefing()
+    settings = _get_or_create_settings(db)
+    email_to = settings.email_address.strip() if settings.email_address else ""
 
-    log = (
-        db.query(models.BriefingLog)
-        .order_by(models.BriefingLog.sent_at.desc())
-        .first()
+    briefing_text = generate_briefing(db)
+
+    if email_to:
+        success, error = send_email(email_to, briefing_text)
+    else:
+        success, error = False, "No email address configured in Settings"
+
+    log_entry = models.BriefingLog(
+        briefing_text=briefing_text,
+        email_sent_to=email_to or None,
+        success=success,
+        error_message=error,
     )
-    if not log:
-        raise HTTPException(status_code=500, detail="Briefing ran but no log entry was found")
-    return log
+    db.add(log_entry)
+    db.commit()
+    db.refresh(log_entry)
+    return log_entry

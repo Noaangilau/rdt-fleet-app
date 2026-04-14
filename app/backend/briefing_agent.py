@@ -12,11 +12,8 @@ Three public functions:
 """
 
 import os
-import smtplib
 import logging
 from datetime import datetime
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 from dotenv import load_dotenv
 
@@ -72,57 +69,47 @@ def generate_briefing(db: Session) -> str:
 
 def send_email(to_address: str, briefing_text: str) -> tuple[bool, str | None]:
     """
-    Send the morning briefing via SMTP.
-    Reads SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD from environment.
+    Send the morning briefing via Resend.
+    Reads RESEND_API_KEY from environment.
     Returns (success: bool, error_message: str | None).
     """
-    smtp_host = os.environ.get("SMTP_HOST", "").strip()
-    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
-    smtp_user = os.environ.get("SMTP_USER", "").strip()
-    smtp_password = os.environ.get("SMTP_PASSWORD", "").strip()
+    import resend
 
-    if not all([smtp_host, smtp_user, smtp_password, to_address]):
-        return False, "SMTP not configured — set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD in .env"
+    api_key = os.environ.get("RESEND_API_KEY", "").strip()
+    if not api_key:
+        return False, "Resend not configured — set RESEND_API_KEY in environment"
+    if not to_address:
+        return False, "No recipient email address configured in Settings"
+
+    resend.api_key = api_key
+
+    today_str = datetime.now().strftime("%A, %B %-d")
+
+    html_body = f"""
+    <html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: #68ccd1; color: white; padding: 12px 20px; border-radius: 8px 8px 0 0;">
+        <strong>RDT Inc. — Morning Fleet Briefing</strong><br>
+        <small>{today_str}</small>
+      </div>
+      <div style="background: #f9f9f9; border: 1px solid #e0e0e0; border-top: none;
+                  padding: 20px; border-radius: 0 0 8px 8px; line-height: 1.6; color: #333;">
+        {briefing_text.replace(chr(10), '<br>')}
+      </div>
+      <p style="font-size: 11px; color: #999; margin-top: 12px;">
+        Sent by FleetBot · RDT Inc. Fleet Management · Vernal, UT
+      </p>
+    </body></html>
+    """
 
     try:
-        today_str = datetime.now().strftime("%A, %B %-d")
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"RDT Morning Briefing — {today_str}"
-        msg["From"] = smtp_user
-        msg["To"] = to_address
-
-        # Plain text part
-        plain = MIMEText(briefing_text, "plain")
-
-        # HTML part with simple styling
-        html_body = f"""
-        <html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: #68ccd1; color: white; padding: 12px 20px; border-radius: 8px 8px 0 0;">
-            <strong>RDT Inc. — Morning Fleet Briefing</strong><br>
-            <small>{today_str}</small>
-          </div>
-          <div style="background: #f9f9f9; border: 1px solid #e0e0e0; border-top: none;
-                      padding: 20px; border-radius: 0 0 8px 8px; line-height: 1.6; color: #333;">
-            {briefing_text.replace(chr(10), '<br>')}
-          </div>
-          <p style="font-size: 11px; color: #999; margin-top: 12px;">
-            Sent by FleetBot · RDT Inc. Fleet Management · Vernal, UT
-          </p>
-        </body></html>
-        """
-        html = MIMEText(html_body, "html")
-
-        msg.attach(plain)
-        msg.attach(html)
-
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.ehlo()
-            server.starttls()
-            server.login(smtp_user, smtp_password)
-            server.sendmail(smtp_user, to_address, msg.as_string())
-
+        resend.Emails.send({
+            "from": "FleetBot <onboarding@resend.dev>",
+            "to": [to_address],
+            "subject": f"RDT Morning Briefing — {today_str}",
+            "html": html_body,
+            "text": briefing_text,
+        })
         return True, None
-
     except Exception as e:
         logger.error(f"Email send failed: {e}")
         return False, str(e)

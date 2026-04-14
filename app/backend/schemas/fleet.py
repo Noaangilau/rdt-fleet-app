@@ -107,7 +107,6 @@ class MileageLogOut(BaseModel):
 # --- Repair Appointments ---
 
 class RepairAppointmentCreate(BaseModel):
-    truck_id: int
     incident_id: Optional[int] = None
     scheduled_date: date
     mechanic_name: Optional[str] = None
@@ -147,7 +146,6 @@ class RepairAppointmentOut(BaseModel):
 # --- Fuel Logs ---
 
 class FuelLogCreate(BaseModel):
-    truck_id: int
     date: date
     gallons: float
     cost_per_gallon: float
@@ -175,7 +173,6 @@ class FuelLogOut(BaseModel):
 # --- Repair Costs ---
 
 class RepairCostCreate(BaseModel):
-    truck_id: int
     appointment_id: Optional[int] = None
     date: date
     description: str

@@ -15,7 +15,7 @@ from database import get_db
 from auth import require_manager
 import models
 import schemas
-from briefing_agent import generate_briefing, send_email
+from briefing_agent import generate_briefing, send_email, run_morning_briefing
 
 router = APIRouter(prefix="/api/briefings", tags=["briefings"])
 
